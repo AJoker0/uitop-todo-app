@@ -76,6 +76,8 @@ npm run build
 npm install && npm run build
 ```
 
+`npm install` на корне запускает `postinstall`, который докачивает devDependencies для `backend` и `frontend`.
+
 4. Start command:
 
 ```powershell
@@ -88,8 +90,6 @@ npm --prefix backend run start
 NODE_ENV=production
 PORT=10000
 ```
-
-`npm install` в корне теперь подтягивает зависимости для `backend` и `frontend` через npm workspaces, поэтому Render больше не падает на отсутствии `@types/node`.
 
 ### Frontend на Vercel
 
