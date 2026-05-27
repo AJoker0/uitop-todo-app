@@ -9,7 +9,7 @@ app.use(express.json());
 const PORT = process.env.PORT || 3001;
 
 initDB().then(db => {
-  const asyncHandler = (handler: (req: express.Request, res: express.Response) => Promise<unknown>) => async (req: express.Request, res: express.Response) => {
+  const asyncHandler = (handler: (req: any, res: any) => Promise<unknown>) => async (req: any, res: any) => {
     try {
       await handler(req, res);
     } catch (error) {
