@@ -6,7 +6,6 @@
     "moduleResolution": "node",
     "outDir": "./dist",
     "rootDir": "./src",
-    "types": ["node"],
     "ignoreDeprecations": "6.0",
     "strict": true,
     "esModuleInterop": true,
