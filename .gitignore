@@ -26,6 +26,10 @@ lerna-debug.log*
 backend/database.sqlite
 *.sqlite
 *.sqlite-journal
+backend/src/*.js
+backend/src/*.js.map
+backend/src/*.d.ts
+backend/src/*.d.ts.map
 
 # Editor and OS files
 .vscode/*
