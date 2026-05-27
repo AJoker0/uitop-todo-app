@@ -1,67 +1,79 @@
 # UITOP Todo App
 
-Small full-stack todo app with categories, SQLite persistence, filtering, and undo actions.
+Небольшое full-stack приложение для задач с категориями. Бэкенд хранит данные в SQLite, фронтенд умеет фильтровать задачи, отмечать их выполненными, удалять и откатывать действия через Undo.
 
-## Features
+## Что умеет
 
-- Create todos with text and category.
-- Filter todos by category or show all.
-- Mark todos as completed.
-- Delete todos.
-- Undo both completion and delete actions for 5 seconds.
-- Enforced limit of 5 todos per category.
-- Loading, error, and empty states in the UI.
+- Создавать задачу с текстом и категорией.
+- Показывать список задач с категорией и статусом.
+- Отмечать задачу выполненной.
+- Удалять задачу.
+- Фильтровать задачи по категории или показывать все.
+- Не давать создавать больше 5 задач в одной категории.
+- Показывать snackbar с Undo на 5 секунд при завершении и удалении.
+- Показывать состояния загрузки, ошибки и пустого списка.
 
-## Tech Stack
+## Стек
 
 - Frontend: React, TypeScript, Vite, React Hook Form, Axios, React Hot Toast, TailwindCSS.
 - Backend: Node.js, Express, TypeScript, SQLite.
 
-## Run Locally
+## Как запустить
 
-### 1. Install dependencies
+### Вариант 1. Одной командой
 
 ```powershell
 cd D:\uitop-todo-app
 npm install
-```
-
-### 2. Start both apps together
-
-```powershell
-cd D:\uitop-todo-app
 npm run dev
 ```
 
-This starts the backend on `http://localhost:3001` and the frontend on `http://localhost:5173`.
+После запуска:
+- backend: `http://localhost:3001`
+- frontend: `http://localhost:5173`
 
-### 3. Build both apps
-
-```powershell
-cd D:\uitop-todo-app
-npm run build
-```
-
-If you want to run them separately, you can still use the package-level commands in `backend/` and `frontend/`.
-
-## Docker
+### Вариант 2. Через Docker
 
 ```powershell
 cd D:\uitop-todo-app
 docker compose up --build
 ```
 
-This starts the backend on `http://localhost:3001` and the frontend on `http://localhost:5173`.
+### Вариант 3. По отдельности
+
+Backend:
+
+```powershell
+cd D:\uitop-todo-app\backend
+npm install
+npm run dev
+```
+
+Frontend:
+
+```powershell
+cd D:\uitop-todo-app\frontend
+npm install
+npm run dev
+```
+
+## Сборка
+
+```powershell
+cd D:\uitop-todo-app
+npm run build
+```
 
 ## API
 
-- `GET /categories`
-- `GET /todos?category=Work`
-- `POST /todos`
-- `PATCH /todos/:id`
-- `DELETE /todos/:id`
+- `GET /categories` - получить список категорий
+- `GET /todos?category=Work` - получить задачи с фильтром по категории
+- `POST /todos` - создать задачу
+- `PATCH /todos/:id` - обновить статус задачи
+- `DELETE /todos/:id` - удалить задачу
 
-## Notes
+## Полезные заметки
 
-- The backend stores data in a local SQLite database file.
-- The frontend expects the backend at `http://localhost:3001`.
+- База данных лежит локально в SQLite-файле на бэкенде.
+- Если backend не запущен, фронт честно покажет ошибку загрузки данных.
+- Для сдачи проекта не хватает только публичного деплоя и, если хочется, тестов.

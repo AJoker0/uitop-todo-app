@@ -80,6 +80,75 @@ export const useTodos = (selectedCategory: string) => {
     return createdTodo as Todo;
   }, [selectedCategory]);
 
+  // Bulk complete keeps the same undo window as single-item actions.
+  const completeTodos = useCallback((todosToComplete: Todo[]) => {
+    const pendingTodos = todosToComplete.filter(todo => !todo.isCompleted && !todo.isPendingRemoval);
+
+    if (pendingTodos.length === 0) {
+      return;
+    }
+
+    const snapshots = new Map(pendingTodos.map(todo => [todo.id, todo] as const));
+    const pendingIds = new Set(pendingTodos.map(todo => todo.id));
+
+    pendingTodos.forEach(todo => {
+      clearTimer(completionTimers, todo.id);
+      clearTimer(deletionTimers, todo.id);
+    });
+
+    setTodos(prev => prev.map(todo => (
+      pendingIds.has(todo.id)
+        ? { ...todo, isCompleted: true, isPendingRemoval: true }
+        : todo
+    )));
+
+    let isUndone = false;
+
+    toast.custom((t) =>
+      createElement(
+        'div',
+        { className: 'flex items-center gap-4 rounded-2xl bg-slate-950 px-4 py-3 text-white shadow-lg' },
+        createElement('span', null, `Marked ${pendingTodos.length} task${pendingTodos.length === 1 ? '' : 's'} as done.`),
+        createElement(
+          'button',
+          {
+            onClick: () => {
+              isUndone = true;
+              window.clearTimeout(timerId);
+              toast.dismiss(t.id);
+              setTodos(prev => prev.map(todo => snapshots.get(todo.id) ?? todo));
+            },
+            className: 'rounded-full bg-white px-3 py-1 text-sm font-medium text-slate-950 hover:bg-slate-100',
+          },
+          'Undo'
+        )
+      ),
+    { duration: 5000, id: `undo-complete-${pendingTodos.map(todo => todo.id).join('-')}` });
+
+    const timerId = window.setTimeout(async () => {
+      if (isUndone) {
+        return;
+      }
+
+      try {
+        await Promise.all(
+          pendingTodos.map(todo => axios.delete(`${API_URL}/todos/${todo.id}`))
+        );
+        setTodos(prev => prev.filter(todo => !pendingIds.has(todo.id)));
+      } catch {
+        setTodos(prev => prev.map(todo => snapshots.get(todo.id) ?? todo));
+        toast.error('Failed to complete tasks');
+      }
+    }, 5000);
+
+    pendingTodos.forEach(todo => {
+      completionTimers.current.set(todo.id, timerId);
+    });
+
+    return timerId;
+  }, []);
+
+  // Small helper for the 5-second undo flow shared by delete and single complete.
   const actionWithUndo = useCallback((
     todo: Todo,
     actionName: 'complete' | 'delete',
@@ -187,5 +256,5 @@ export const useTodos = (selectedCategory: string) => {
     deletionTimers.current.set(todo.id, timerId);
   };
 
-  return { todos, loading, error, toggleTodo, deleteTodo, fetchTodos, createTodo };
+  return { todos, loading, error, toggleTodo, deleteTodo, fetchTodos, createTodo, completeTodos };
 };

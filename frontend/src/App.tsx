@@ -17,8 +17,9 @@ function App() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [categoriesError, setCategoriesError] = useState<string | null>(null);
+  const [selectedTodoIds, setSelectedTodoIds] = useState<number[]>([]);
 
-  const { todos, loading, error, toggleTodo, deleteTodo, createTodo } = useTodos(selectedCategory);
+  const { todos, loading, error, toggleTodo, deleteTodo, createTodo, completeTodos } = useTodos(selectedCategory);
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -38,6 +39,12 @@ function App() {
   }, []);
 
   const filteredTodos = useMemo(() => todos, [todos]);
+  const selectableTodos = useMemo(() => filteredTodos.filter(todo => !todo.isCompleted && !todo.isPendingRemoval), [filteredTodos]);
+  const selectedTodos = useMemo(
+    () => filteredTodos.filter(todo => selectedTodoIds.includes(todo.id)),
+    [filteredTodos, selectedTodoIds],
+  );
+  const allSelectableSelected = selectableTodos.length > 0 && selectableTodos.every(todo => selectedTodoIds.includes(todo.id));
   const completedCount = filteredTodos.filter(todo => todo.isCompleted).length;
   const activeCount = filteredTodos.length - completedCount;
 
@@ -46,11 +53,43 @@ function App() {
     toast.success(`Added to ${createdTodo.categoryName}`);
   };
 
+  const toggleSelection = (todoId: number) => {
+    setSelectedTodoIds(prev => prev.includes(todoId)
+      ? prev.filter(id => id !== todoId)
+      : [...prev, todoId]);
+  };
+
+  // This only affects the currently visible list, not hidden categories.
+  const toggleSelectAllVisible = () => {
+    setSelectedTodoIds(prev => {
+      if (allSelectableSelected) {
+        return prev.filter(id => !selectableTodos.some(todo => todo.id === id));
+      }
+
+      const nextIds = new Set(prev);
+      selectableTodos.forEach(todo => nextIds.add(todo.id));
+      return Array.from(nextIds);
+    });
+  };
+
+  const handleBulkComplete = () => {
+    if (selectedTodos.length === 0) {
+      return;
+    }
+
+    completeTodos(selectedTodos);
+    setSelectedTodoIds([]);
+  };
+
+  useEffect(() => {
+    setSelectedTodoIds([]);
+  }, [selectedCategory]);
+
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.18),_transparent_42%),linear-gradient(180deg,#f8fafc_0%,#eef2ff_100%)] text-slate-900">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.18),transparent_42%),linear-gradient(180deg,#f8fafc_0%,#eef2ff_100%)] text-slate-900">
       <Toaster position="top-center" toastOptions={{ duration: 5000 }} />
       <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-6 px-4 py-8 lg:px-6">
-        <section className="overflow-hidden rounded-[2rem] border border-white/70 bg-slate-950 px-6 py-8 text-white shadow-[0_30px_80px_rgba(15,23,42,0.25)] md:px-8">
+        <section className="overflow-hidden rounded-4xl border border-white/70 bg-slate-950 px-6 py-8 text-white shadow-[0_30px_80px_rgba(15,23,42,0.25)] md:px-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl space-y-4">
               <span className="inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-cyan-200">
@@ -112,19 +151,56 @@ function App() {
                 <EmptyState />
               ) : (
                 <div className="space-y-3">
+                  <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                    <label className="inline-flex items-center gap-2 text-sm font-medium text-slate-700">
+                      <input
+                        type="checkbox"
+                        checked={allSelectableSelected}
+                        onChange={toggleSelectAllVisible}
+                        disabled={selectableTodos.length === 0}
+                        className="h-4 w-4 rounded border-slate-300 text-cyan-600 focus:ring-cyan-500 disabled:cursor-not-allowed"
+                      />
+                      Select all visible
+                    </label>
+
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-slate-500">
+                        Selected: {selectedTodos.length}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={handleBulkComplete}
+                        disabled={selectedTodos.length === 0}
+                        className="rounded-2xl bg-cyan-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-cyan-500 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        Mark selected as done
+                      </button>
+                    </div>
+                  </div>
+
                   {filteredTodos.map(todo => (
                     <article
                       key={todo.id}
                       className={`flex flex-col gap-3 rounded-2xl border px-4 py-4 transition sm:flex-row sm:items-center sm:justify-between ${todo.isCompleted ? 'border-emerald-200 bg-emerald-50/70' : 'border-slate-200 bg-white'} ${todo.isPendingRemoval ? 'ring-2 ring-amber-300/60' : ''}`}
                     >
-                      <label className="flex flex-1 items-start gap-3">
+                      <div className="flex flex-1 items-start gap-3">
                         <input
                           type="checkbox"
-                          checked={todo.isCompleted}
-                          onChange={() => toggleTodo(todo)}
-                          disabled={todo.isPendingRemoval}
-                          className="mt-1 h-5 w-5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 disabled:cursor-not-allowed"
+                          checked={selectedTodoIds.includes(todo.id)}
+                          onChange={() => toggleSelection(todo.id)}
+                          disabled={todo.isCompleted || todo.isPendingRemoval}
+                          aria-label={`Select ${todo.text}`}
+                          className="mt-1 h-5 w-5 rounded border-slate-300 text-cyan-600 focus:ring-cyan-500 disabled:cursor-not-allowed"
                         />
+                        <div className="flex flex-1 items-start gap-3">
+                          <input
+                            type="checkbox"
+                            checked={todo.isCompleted}
+                            onChange={() => toggleTodo(todo)}
+                            disabled={todo.isPendingRemoval}
+                            aria-label={`Mark ${todo.text} as completed`}
+                            className="mt-1 h-5 w-5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 disabled:cursor-not-allowed"
+                          />
                         <div className="space-y-1">
                           <div className={`text-sm font-medium sm:text-base ${todo.isCompleted ? 'text-slate-500 line-through' : 'text-slate-900'}`}>
                             {todo.text}
@@ -138,7 +214,8 @@ function App() {
                             {todo.isPendingRemoval && <span className="rounded-full bg-amber-100 px-2.5 py-1 font-medium text-amber-700">Undo available</span>}
                           </div>
                         </div>
-                      </label>
+                        </div>
+                      </div>
 
                       <button
                         type="button"
