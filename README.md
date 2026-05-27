@@ -22,30 +22,36 @@ Small full-stack todo app with categories, SQLite persistence, filtering, and un
 ### 1. Install dependencies
 
 ```powershell
-cd D:\uitop-todo-app\backend
-npm install
-
-cd D:\uitop-todo-app\frontend
+cd D:\uitop-todo-app
 npm install
 ```
 
-### 2. Start the backend
+### 2. Start both apps together
 
 ```powershell
-cd D:\uitop-todo-app\backend
+cd D:\uitop-todo-app
 npm run dev
 ```
 
-The API runs on `http://localhost:3001`.
+This starts the backend on `http://localhost:3001` and the frontend on `http://localhost:5173`.
 
-### 3. Start the frontend
+### 3. Build both apps
 
 ```powershell
-cd D:\uitop-todo-app\frontend
-npm run dev
+cd D:\uitop-todo-app
+npm run build
 ```
 
-Open the Vite URL shown in the terminal, usually `http://localhost:5173`.
+If you want to run them separately, you can still use the package-level commands in `backend/` and `frontend/`.
+
+## Docker
+
+```powershell
+cd D:\uitop-todo-app
+docker compose up --build
+```
+
+This starts the backend on `http://localhost:3001` and the frontend on `http://localhost:5173`.
 
 ## API
 

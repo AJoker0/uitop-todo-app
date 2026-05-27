@@ -1,14 +1,13 @@
-version: '3.8'
-
 services:
   backend:
-    build: 
+    build:
       context: ./backend
       dockerfile: Dockerfile
     ports:
       - "3001:3001"
     volumes:
-      - ./backend/database.sqlite:/usr/src/app/database.sqlite
+      - ./backend:/app
+      - /app/node_modules
 
   frontend:
     build:
@@ -16,5 +15,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "5173:5173"
-    environment:
-      - VITE_API_URL=http://localhost:3001
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend

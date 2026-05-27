@@ -166,10 +166,11 @@ function App() {
             </div>
 
             <div className="rounded-3xl border border-slate-200/70 bg-white/90 p-5 shadow-[0_18px_45px_rgba(15,23,42,0.08)] backdrop-blur">
-              <h3 className="text-lg font-semibold text-slate-950">Backend</h3>
+              <h3 className="text-lg font-semibold text-slate-950">Про бэк</h3>
               <p className="mt-3 text-sm leading-6 text-slate-600">
-                Express API stores data in SQLite. If the server is not running on port 3001,
-                the UI will show an error state until the API is available.
+                Тут живет Express API и хранит все в SQLite, как аккуратный завхоз с ключами от склада.
+                Если бэк спит на порту 3001, фронт не делает вид, что всё нормально, а честно показывает ошибку,
+                чтобы никто не играл в «у меня и так работает».
               </p>
             </div>
           </aside>
