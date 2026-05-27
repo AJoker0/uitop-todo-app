@@ -118,3 +118,8 @@ VITE_API_URL=https://your-backend.onrender.com
 - База данных лежит локально в SQLite-файле на бэкенде.
 - Если backend не запущен, фронт честно покажет ошибку загрузки данных.
 - Для сдачи проекта не хватает только публичного деплоя и, если хочется, тестов.
+
+
+  <img width="993" height="662" alt="{D9CCC604-ACBF-4ECC-A7EE-55145A7A7666}" src="https://github.com/user-attachments/assets/551439a6-1b64-460e-8fdd-3b3af2d5809a" />
+<img width="1280" height="909" alt="зображення" src="https://github.com/user-attachments/assets/15e1a139-0be2-4316-84a8-d836406f9d9e" />
+<img width="1280" height="894" alt="зображення" src="https://github.com/user-attachments/assets/88f27450-e5f7-434e-ba45-93dcd3e3cbb5" />
