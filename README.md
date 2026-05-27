@@ -64,6 +64,47 @@ cd D:\uitop-todo-app
 npm run build
 ```
 
+## Деплой
+
+### Backend на Render
+
+1. Создай новый Web Service из GitHub-репозитория.
+2. Root directory: корень репозитория.
+3. Build command:
+
+```powershell
+npm install && npm run build
+```
+
+4. Start command:
+
+```powershell
+npm --prefix backend run start
+```
+
+5. Environment:
+
+```text
+NODE_ENV=production
+PORT=10000
+```
+
+`npm install` в корне теперь подтягивает зависимости для `backend` и `frontend` через npm workspaces, поэтому Render больше не падает на отсутствии `@types/node`.
+
+### Frontend на Vercel
+
+1. Создай новый Project из того же репозитория.
+2. Root directory: `frontend`
+3. Build command: `npm run build`
+4. Output directory: `dist`
+5. Добавь environment variable:
+
+```text
+VITE_API_URL=https://your-backend.onrender.com
+```
+
+После этого перезагрузи деплой фронта.
+
 ## API
 
 - `GET /categories` - получить список категорий
